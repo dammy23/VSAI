@@ -1,0 +1,83 @@
+{
+    "name": "custom-ai",
+    "displayName": "Custom AI",
+    "description": "A custom AI assistant for VS Code.",
+    "version": "0.0.1",
+    "engines": {
+        "vscode": "^1.83.0"
+    },
+    "categories": [
+        "Other"
+    ],
+    "activationEvents": [
+        "onCommand:customAI.startChat",
+        "onCommand:customAI.askAboutCode",
+        "onCommand:customAI.setApiKey"
+    ],
+    "main": "./out/extension.js",
+    "contributes": {
+        "commands": [
+            {
+                "command": "customAI.startChat",
+                "title": "Custom AI: Start Chat"
+            },
+            {
+                "command": "customAI.askAboutCode",
+                "title": "Custom AI: Ask About This Code"
+            },
+            {
+                "command": "customAI.setApiKey",
+                "title": "Custom AI: Set API Key"
+            }
+        ],
+        "menus": {
+            "editor/context": [
+                {
+                    "when": "editorHasSelection",
+                    "command": "customAI.askAboutCode",
+                    "group": "navigation"
+                }
+            ]
+        },
+        "viewsContainers": {
+            "activitybar": [
+                {
+                    "id": "custom-ai-sidebar",
+                    "title": "Custom AI",
+                    "icon": "media/robot.svg"
+                }
+            ]
+        },
+        "views": {
+            "custom-ai-sidebar": [
+                {
+                    "id": "custom-ai-chat",
+                    "name": "Chat"
+                }
+            ]
+        }
+    },
+    "scripts": {
+        "vscode:prepublish": "npm run compile",
+        "compile": "tsc -p ./",
+        "watch": "tsc -watch -p ./",
+        "pretest": "npm run compile && npm run lint",
+        "lint": "eslint src --ext ts",
+        "test": "node ./out/test/runTest.js"
+    },
+    "devDependencies": {
+        "@types/vscode": "^1.83.0",
+        "@types/glob": "^8.1.0",
+        "@types/mocha": "^10.0.1",
+        "@types/node": "16.x",
+        "eslint": "^8.28.0",
+        "@typescript-eslint/eslint-plugin": "^5.42.0",
+        "@typescript-eslint/parser": "^5.42.0",
+        "glob": "^8.1.0",
+        "mocha": "^10.1.0",
+        "typescript": "^4.9.3",
+        "@vscode/test-electron": "^2.2.0",
+        "@types/mocha": "^10.0.1",
+        "@types/node": "16.x"
+    }
+}
