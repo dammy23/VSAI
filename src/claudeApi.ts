@@ -26,6 +26,7 @@ export async function streamClaudeResponse(
         const model = await getLatestModel();
 
         const stream = await anthropic.messages.stream({
+            max_tokens: 4096,
             model: model,
             messages: [{ role: 'user', content: prompt }],
             system: "You are a world-class AI assistant integrated into Visual Studio Code. Your name is Claude. Be concise, helpful, and an expert in all programming languages and technologies. Format your responses using markdown.",
@@ -51,12 +52,17 @@ export async function claudeCodeFix(
         const model = await getLatestModel();
 
         const response = await anthropic.messages.create({
+            max_tokens: 4096,
             model: model,
             messages: [{ role: 'user', content: `Fix the following code:\n\n${code}` }],
             system: "You are a senior software engineer. Improve and fix the provided code, keeping its functionality intact. Only return the fixed code, without any extra explanations or formatting.",
         });
 
-        return response.content[0].text;
+        const textBlock = response.content.find((block): block is Anthropic.TextBlock => block.type === 'text');
+        if (textBlock) {
+            return textBlock.text;
+        }
+        return '';
     } catch (error: any) {
         vscode.window.showErrorMessage(`Error communicating with Anthropic API: ${error.message}`);
         throw error;
@@ -72,12 +78,17 @@ export async function claudeCodeCompletion(
         const model = await getLatestModel();
 
         const response = await anthropic.messages.create({
+            max_tokens: 4096,
             model: model,
             messages: [{ role: 'user', content: `Complete the following code:\n\n${code}` }],
             system: "You are a world-class AI assistant for code completion. Complete the given code snippet. Only return the completed code, without any extra explanations or formatting.",
         });
 
-        return response.content[0].text;
+        const textBlock = response.content.find((block): block is Anthropic.TextBlock => block.type === 'text');
+        if (textBlock) {
+            return textBlock.text;
+        }
+        return '';
     } catch (error: any) {
         vscode.window.showErrorMessage(`Error communicating with Anthropic API: ${error.message}`);
         throw error;
