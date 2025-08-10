@@ -1,8 +1,8 @@
 {
-    "name": "custom-ai",
-    "displayName": "Custom AI",
-    "description": "A custom AI assistant for VS Code.",
-    "version": "0.0.1",
+    "name": "claude-vscode-extension",
+    "displayName": "Claude for VS Code",
+    "description": "An extension that integrates Anthropic's Claude into VS Code for chat, code completion, and code fixing.",
+    "version": "1.0.0",
     "engines": {
         "vscode": "^1.83.0"
     },
@@ -10,31 +10,41 @@
         "Other"
     ],
     "activationEvents": [
-        "onCommand:customAI.startChat",
-        "onCommand:customAI.askAboutCode",
-        "onCommand:customAI.setApiKey"
+        "onCommand:claude.chat",
+        "onCommand:claude.codeCompletion",
+        "onCommand:claude.codeFix",
+        "onCommand:claude.setApiKey"
     ],
     "main": "./out/extension.js",
     "contributes": {
         "commands": [
             {
-                "command": "customAI.startChat",
-                "title": "Custom AI: Start Chat"
+                "command": "claude.chat",
+                "title": "Claude: Start Chat"
             },
             {
-                "command": "customAI.askAboutCode",
-                "title": "Custom AI: Ask About This Code"
+                "command": "claude.codeCompletion",
+                "title": "Claude: Code Completion"
             },
             {
-                "command": "customAI.setApiKey",
-                "title": "Custom AI: Set API Key"
+                "command": "claude.codeFix",
+                "title": "Claude: Fix Code"
+            },
+            {
+                "command": "claude.setApiKey",
+                "title": "Claude: Set API Key"
             }
         ],
         "menus": {
             "editor/context": [
                 {
                     "when": "editorHasSelection",
-                    "command": "customAI.askAboutCode",
+                    "command": "claude.codeCompletion",
+                    "group": "navigation"
+                },
+                {
+                    "when": "editorHasSelection",
+                    "command": "claude.codeFix",
                     "group": "navigation"
                 }
             ]
@@ -42,16 +52,16 @@
         "viewsContainers": {
             "activitybar": [
                 {
-                    "id": "custom-ai-sidebar",
-                    "title": "Custom AI",
+                    "id": "claude-sidebar",
+                    "title": "Claude",
                     "icon": "media/robot.svg"
                 }
             ]
         },
         "views": {
-            "custom-ai-sidebar": [
+            "claude-sidebar": [
                 {
-                    "id": "custom-ai-chat",
+                    "id": "claude.chat",
                     "name": "Chat"
                 }
             ]
@@ -76,8 +86,9 @@
         "glob": "^8.1.0",
         "mocha": "^10.1.0",
         "typescript": "^4.9.3",
-        "@vscode/test-electron": "^2.2.0",
-        "@types/mocha": "^10.0.1",
-        "@types/node": "16.x"
+        "@vscode/test-electron": "^2.2.0"
+    },
+    "dependencies": {
+        "@anthropic-ai/sdk": "^0.20.1"
     }
 }

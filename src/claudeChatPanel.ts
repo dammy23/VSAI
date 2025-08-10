@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
-import { getResponse } from './api';
-export class ChatViewProvider implements vscode.WebviewViewProvider {
-    public static readonly viewType = 'custom-ai-chat';
+import { streamClaudeResponse } from './claudeApi';
+export class ClaudeChatPanel implements vscode.WebviewViewProvider {
+    public static readonly viewType = 'claude.chat';
 
     private _view?: vscode.WebviewView;
 
@@ -27,14 +27,22 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
             switch (data.type) {
                 case 'askQuestion':
                     {
-                        const apiKey = await this._context.secrets.get('apiKey');
+                        const apiKey = await this._context.secrets.get('anthropic.apiKey');
                         if (!apiKey) {
-                            vscode.window.showErrorMessage('API key not set. Please run the "Custom AI: Set API Key" command.');
+                            vscode.window.showErrorMessage('API key not set. Please run the "Claude: Set API Key" command.');
                             return;
                         }
-                        this.postMessage({ type: 'addResponse', value: 'Thinking...' });
-                        const response = await getResponse(data.value);
-                        this.postMessage({ type: 'addResponse', value: response });
+
+                        try {
+                            await streamClaudeResponse(this._context, data.value, (chunk) => {
+                                this.postMessage({ type: 'streamResponse', value: chunk });
+                            });
+                        } catch (error) {
+                            // The error is already shown by the API function
+                        } finally {
+                            this.postMessage({ type: 'streamEnd' });
+                        }
+
                         break;
                     }
             }
@@ -76,15 +84,15 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
 				<link href="${styleVSCodeUri}" rel="stylesheet">
 				<link href="${styleMainUri}" rel="stylesheet">
 
-				<title>Chat</title>
+				<title>Claude Chat</title>
 			</head>
 			<body>
-				<ul id="chat-log">
-				</ul>
-
-				<div id="input-container">
-					<input type="text" id="question-input" placeholder="Ask a question..." />
-					<button id="ask-button">Ask</button>
+				<div id="chat-container">
+					<div id="chat-log"></div>
+					<div id="input-container">
+						<textarea id="question-input" placeholder="Ask a question..." rows="3"></textarea>
+						<button id="ask-button">Ask</button>
+					</div>
 				</div>
 
 				<script nonce="${nonce}" src="${scriptUri}"></script>
